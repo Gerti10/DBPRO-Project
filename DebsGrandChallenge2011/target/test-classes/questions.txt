@@ -1,0 +1,5 @@
+1,Who was the director of the CIA from 1976-81?,Ronald Reagan,George Bush,Bill Clinton,Richard Nixon,George Bush
+2,In which mountains are Camp David?,Appalachian,Ouachita,Rocky,Blue Ridge,Appalachian          
+3,Which song say, "The words of the prophet are written on the subway walls?",Blessed,I am a Rock,Kathy's song,Sounds of Silence,Sounds of Silence
+4,Who sang the title song for the Bond film A View To A Kill?,Led Zeppelin,Duran Duran,The Doors,Iggy Pop,Duran Duran              
+5,In which country did General Jaruzelski impose marital law in 1981?,Brazil,Russia,Poland,Spain,Poland    
