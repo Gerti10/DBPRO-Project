@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Trivia Geeks Club</title>
+    <link rel="stylesheet" href="gameStyle.css">
+</head>
+<body bgcolor = "#f0f0f0">
+<fieldset>
+
+    <div class="block_1 hline-bottom"> Answer the questions </div>
+    <br><br>
+    <h1>QuestionID: </h1><div id="questionIDBox"></div>
+    <br><br>
+    <h1>Question: </h1><div id="questionBox"></div>
+    <br><br><br>
+    <form>
+    <input type="radio" id="answer1" name="answers" value="firstAnswer">
+    <label for="answer1" id = "label1"> Answer 1 </label>
+    <input type="radio" id="answer2" name="answers" value="secondAnswer">
+    <label for="answer2" id = "label2">  Answer 2 </label>
+    <input type="radio" id="answer3" name="answers" value="thirdAnswer">
+    <label for="answer3" id = "label3"> Answer 3 </label>
+    <input type="radio" id="answer4" name="answers" value="fourthAnswer">
+    <label for="answer4" id = "label4"> Answer 4 </label>
+    <br><br>
+    <input onclick="sendAnswer()" type="button" value="Answer">
+    <input onclick="sendReqAnswer()" type="button" value="Ask for the most frequent answer">
+    </form>
+    <p>Most frequent Answer is: ...</p><div id="mfaBox"></div>
+    <br><br><br><br>
+    <table class="a">
+        <tr>
+            <td>PlayerId</td>
+            <td>PlayerName</td>
+            <td>Scores</td>
+        </tr>
+        <tr>
+            <td>empty</td>
+            <td>empty</td>
+            <td>empty</td>
+        </tr>
+    </table>
+
+</fieldset>
+    <script type="text/javascript">
+        var webSocket = new WebSocket("ws://localhost:8080/DebsChallenge2011_Test_war_exploded/socket");
+        var radios = document.getElementsByName("answers");
+        //bug always selects the 4th answer
+        for (var i = 0; i<radios.length; i++) {
+                var selector = 'label[for=' + radios[i].id + ']'
+                var label = document.querySelector(selector);
+                var text = label.innerHTML;
+        }
+
+        function sendAnswer() {
+            var time = new Date();
+            var timetoMilli = time.getTime();
+            var textToSend = text + "," +timetoMilli.toString();
+            webSocket.send(textToSend);
+        }
+
+        function sendReqAnswer() {
+            var mfa = "Most freq answer";
+            webSocket.send(mfa);
+        }
+
+        webSocket.onmessage = function(message) {
+            var obj = JSON.parse(message.data);
+            document.getElementById("questionIDBox").innerHTML =  obj.qId;
+            document.getElementById("questionBox").innerHTML = obj.question;
+            //document.getElementById("mfaBox").innerHTML = message.data;
+            document.getElementById("label1").innerHTML = obj.ans1;
+            document.getElementById("label2").innerHTML = obj.ans2;
+            document.getElementById("label3").innerHTML = obj.ans3;
+            document.getElementById("label4").innerHTML = obj.ans4;
+        }
+
+        webSocket.onopen = function() {
+            console.log("connection opened");
+        };
+
+        webSocket.onclose = function() {
+            console.log("connection closed");
+        };
+        webSocket.onerror = function wserror(message) {
+            console.log("error: " + message);
+        };
+
+
+    </script>
+</body>
+</html>
