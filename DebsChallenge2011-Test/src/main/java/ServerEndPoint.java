@@ -25,7 +25,7 @@ public class ServerEndPoint {
     List<String[]> questionList;
     String[] q;
     JsonObject jsonObject;
-
+    JsonObject object;
     EPRuntime runtime;
 
     public void run(){
@@ -38,13 +38,18 @@ public class ServerEndPoint {
         q = questions.getQuestion();
         jsonObject = getQuestionJson(q);
 
+        object = new JsonObject();
+
         //create Map to send to esper runtime
         String[] answers = new String[4];
         answers[0] = q[2];
         answers[1] = q[3];
         answers[2] = q[4];
         answers[3] = q[5];
-        Map<String, Object> questionEvent = EventFactory.makeTriviaQuestion(q[0], q[1], q[6],System.currentTimeMillis(),answers);
+
+        //qId, question, answer, time, choises
+        Map<String, Object> questionEvent
+                = EventFactory.makeTriviaQuestion(q[0], q[1], q[6], System.currentTimeMillis(), answers);
         System.out.println("Sending question event to runtime...");
         runtime.getEventService().sendEventMap(questionEvent, "TriviaQuestion");
     }
@@ -67,30 +72,37 @@ public class ServerEndPoint {
 
     @OnMessage
     public void onMessage(String message, Session session) {
+        System.out.printf("Message received. Session id: %s Message: %s%n", session.getId(), message);
+        if (message.equals("mfa")){
+            Map<String, Object> mfa = EventFactory.makePlayerFARequest("User1", q[0]);
+            runtime.getEventService().sendEventMap(mfa, "PlayerFARequest");
+            //get the answer from runtime
 
-        System.out.printf("Message received. Session id: %s Message: %s%n",
-                session.getId(), message);
-
-        //send player Answer to the runtime
-        String[] msg =  message.split(",");
-        System.out.println("This is answer "+msg[0] + "and time: "+ msg[1]);
-        Map<String,Object> pAnswer = EventFactory.makePlayerAnswer("1", q[1], msg[0], Long.parseLong(msg[1]));
-        runtime.getEventService().sendEventMap(pAnswer, "PlayerAnswer");
-
-        //trigger score update
-        runtime.getEventService().sendEventMap(EventFactory.makeUpdateScore(q[0]), "UpdateScore");
-
-        //get player Scores
-        printScore(q[0], getScores(runtime));
-
-
-        try {
-            //session.getBasicRemote().sendText(String.format("We received your message: %s%n", message));
-            session.getBasicRemote().sendText("Do nothing first");
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            
+        }else{
+            //send player Answer to the runtime
+            String[] msg =  message.split(",");
+            Map<String,Object> pAnswer = EventFactory.makePlayerAnswer("User1", q[0], msg[0], Long.parseLong(msg[1]));
+            runtime.getEventService().sendEventMap(pAnswer, "PlayerAnswer");
+            //trigger score update
+            runtime.getEventService().sendEventMap(EventFactory.makeUpdateScore(q[0]), "UpdateScore");
+            //get player Scores
+            //printScore(q[0], getScores(runtime));
+            Map<String, Integer> scores = getScores(runtime);
+            for (Map.Entry<String, Integer> a: scores.entrySet()){
+                //System.out.println("User:" + a.getKey() + "Scores: " + a.getValue());
+                //create a Json Object to send the scores to the player Interface
+                object.add("UserID", a.getKey());
+                object.add("Scores", a.getValue());
+                //System.out.println(object.toString());
+                try {
+                    //session.getBasicRemote().sendText(String.format("We received your message: %s%n", message));
+                    session.getBasicRemote().sendText(object.toString());
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
-
     }
 
     @OnError

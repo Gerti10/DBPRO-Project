@@ -22,7 +22,7 @@
     <input type="radio" id="answer3" name="answers" value="thirdAnswer">
     <label for="answer3" id = "label3"> Answer 3 </label>
     <input type="radio" id="answer4" name="answers" value="fourthAnswer">
-    <label for="answer4" id = "label4"> Answer 4 </label>
+    <label for="answer4" id = "label4">Answer4</label>
     <br><br>
     <input onclick="sendAnswer()" type="button" value="Answer">
     <input onclick="sendReqAnswer()" type="button" value="Ask for the most frequent answer">
@@ -36,9 +36,9 @@
             <td>Scores</td>
         </tr>
         <tr>
-            <td>empty</td>
-            <td>empty</td>
-            <td>empty</td>
+            <td id="playerID">empty</td>
+            <td id="playerName">empty</td>
+            <td id="score">empty</td>
         </tr>
     </table>
 
@@ -61,19 +61,28 @@
         }
 
         function sendReqAnswer() {
-            var mfa = "Most freq answer";
+            var mfa = "mfa";
             webSocket.send(mfa);
         }
 
         webSocket.onmessage = function(message) {
+
             var obj = JSON.parse(message.data);
-            document.getElementById("questionIDBox").innerHTML =  obj.qId;
-            document.getElementById("questionBox").innerHTML = obj.question;
-            //document.getElementById("mfaBox").innerHTML = message.data;
-            document.getElementById("label1").innerHTML = obj.ans1;
-            document.getElementById("label2").innerHTML = obj.ans2;
-            document.getElementById("label3").innerHTML = obj.ans3;
-            document.getElementById("label4").innerHTML = obj.ans4;
+            if(obj.UserID){
+                //use a loop to update the table for all the players
+                document.getElementById("playerID").innerHTML = obj.UserID;
+                document.getElementById("playerName").innerHTML = obj.UserID
+                document.getElementById("score").innerHTML = obj.Scores;
+            }else{
+                document.getElementById("questionIDBox").innerHTML =  obj.qId;
+                document.getElementById("questionBox").innerHTML = obj.question;
+                document.getElementById("mfaBox").innerHTML = message.data;
+                document.getElementById("label1").innerHTML = obj.ans1;
+                document.getElementById("label2").innerHTML = obj.ans2;
+                document.getElementById("label3").innerHTML = obj.ans3;
+                document.getElementById("label4").innerHTML = obj.ans4;
+            }
+
         }
 
         webSocket.onopen = function() {
