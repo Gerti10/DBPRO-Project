@@ -33,8 +33,9 @@ public class Questions {
     }
 
     public String[] getQuestion(){
-        String[] getQuestion = questions.get(lineCounter);
         lineCounter++;
+        String[] getQuestion = questions.get(lineCounter);
+
         return getQuestion; //return a single question
     }
 
