@@ -12,7 +12,7 @@ public class Questions {
     private int lineCounter = 0;
     Questions(){
         lines = new LinkedList<>();
-        questions = new ArrayList<>();
+        questions = new LinkedList<>();
         createQuestionArrayList();
     }
 
@@ -32,10 +32,10 @@ public class Questions {
         }
     }
 
-    public String[] getQuestion(){
-        lineCounter++;
+    public String[] getNextQuestion(){
+        if(lineCounter == questions.size()) lineCounter = 0;
         String[] getQuestion = questions.get(lineCounter);
-
+        lineCounter++;
         return getQuestion; //return a single question
     }
 
@@ -43,6 +43,7 @@ public class Questions {
         return this.questions; //return the question list
     }
 
+    public int getQuestionListSize(){return questions.size();}
 
 
 }

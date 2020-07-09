@@ -24,78 +24,96 @@
     <input type="radio" id="answer4" name="answers" value="4">
     <label for="answer4" id = "label4">Answer4</label>
     <br><br>
-    <input onclick="sendAnswer()" type="button" value="Answer">
-    <input onclick="answerAnnulment()" type="button" value="Answer Annulment">
-    <input onclick="sendReqAnswer()" type="button" value="Ask for the most frequent answer">
+    <input onclick="sendAnswer()" type="button" id="ansButton" value="Answer">
+    <input onclick="answerAnnulment()" type="button" id = "annulButton" value="Answer Annulment">
+    <input onclick="sendReqAnswer()" type="button" id = "mfaButton" value="Ask for the most frequent answer">
     </form>
     <p>Most frequent Answer is: ...</p><div id="mfaBox"></div>
 
     <br><br><br><br>
-    <table class="a">
+    <table class="a" id="myTable">
         <tr>
-            <td>PlayerId</td>
-            <td>PlayerName</td>
+            <td>UserID</td>
+            <td>Player</td>
             <td>Scores</td>
-        </tr>
-        <tr>
-            <td id="playerID">empty</td>
-            <td id="playerName">empty</td>
-            <td id="score">empty</td>
         </tr>
     </table>
 
 </fieldset>
     <script type="text/javascript">
         var webSocket = new WebSocket("ws://localhost:8080/DebsChallenge2011_Test_war_exploded/socket");
-        /*var radios = document.getElementsByName("answers");
-        //bug always selects the 4th answer
-        for (var i = 0; i<radios.length; i++) {
-                var selector = 'label[for=' + radios[i].id + ']'
-                var label = document.querySelector(selector);
-                var text = label.innerHTML;
-        }
-         */
-
+        var timeMillis;
+        var checkedRadio;
         function sendAnswer() {
-            var selectedOption = document.querySelector("input[type=radio]");
-            var answer  = selectedOption.value;
+            var radios = document.getElementsByName("answers");
+            for (var i = 0; i<radios.length; i++){
+                if (radios[i].checked){
+                    checkedRadio = radios[i].value;
+                }
+            }
+            document.getElementById("ansButton").disabled = true;
+            document.getElementById("mfaBox").disabled = true;
+            var answer = checkedRadio;
             var time = new Date();
-            var timetoMilli = time.getTime();
-            var textToSend = answer + "," +timetoMilli.toString();
+            //var timetoMilli = time.getTime();
+            timeMillis = time.getTime();
+            var textToSend = answer + "," +timeMillis.toString();
+            //var textToSend = answer + "," +timetoMilli.toString();
             webSocket.send(textToSend);
         }
 
         function sendReqAnswer() {
             var mfa = "mfa";
+            document.getElementById("mfaButton").disabled = true;
             webSocket.send(mfa);
         }
 
         function answerAnnulment() {
-            var answerAnnulment = "answerAnnulment";
-            webSocket.send(answerAnnulment);
+            document.getElementById("annulButton").disabled = true;
+            webSocket.send("answerAnnulment");
         }
 
-        //request next question
-        setInterval(function(){webSocket.send("getNextQuestion");}, 10000);
-
         webSocket.onmessage = function(message) {
-
             var obj = JSON.parse(message.data);
+            var table = document.getElementById("myTable");
+
             if(obj.UserID){
-                //use a loop to update the table for all the players
-                document.getElementById("playerID").innerHTML = obj.UserID;
-                document.getElementById("playerName").innerHTML = obj.UserID
-                document.getElementById("score").innerHTML = obj.Scores;
-            }else{
+                //if(table.rows.length > 1){
+                    for(var i = table.rows.length-1; i >= 0; i--){
+                      table.deleteRow(i);
+                    }
+                //}
+
+                Object.keys(obj).forEach((key)=> {
+                    if(key !== "UserID"){
+                        var row = table.insertRow(0);
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1);
+                        var cell3 = row.insertCell(2);
+                        cell1.innerHTML = key;
+                        cell2.innerHTML = "User " + key;
+                        cell3.innerHTML = obj[key];
+                    }
+                });
+            }else if(obj.annul){
+                var time = new Date();
+                var timeToMillis = time.getTime();
+                if (timeToMillis-timeMillis < 10000){ //new answer can be given only if the annulment happened 10 sec after answering
+                    document.getElementById("ansButton").disabled = false;
+                }
+            }
+            else{
                 document.getElementById("questionIDBox").innerHTML =  obj.qId;
                 document.getElementById("questionBox").innerHTML = obj.question;
-                document.getElementById("mfaBox").innerHTML = message.data;
+                //document.getElementById("mfaBox").innerHTML = message.data;
                 document.getElementById("label1").innerHTML = obj.ans1;
                 document.getElementById("label2").innerHTML = obj.ans2;
                 document.getElementById("label3").innerHTML = obj.ans3;
                 document.getElementById("label4").innerHTML = obj.ans4;
+                document.getElementById("ansButton").disabled = false;
+                document.getElementById("annulButton").disabled = false;
+                document.getElementById("mfaButton").disabled = false;
             }
-
         }
 
         webSocket.onopen = function() {
@@ -103,9 +121,11 @@
         };
 
         webSocket.onclose = function() {
+            alert("Game Over, No more Questions");
             console.log("connection closed");
         };
         webSocket.onerror = function wserror(message) {
+            alert("Server shutting down");
             console.log("error: " + message);
         };
 
