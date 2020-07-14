@@ -65,7 +65,7 @@ public class ServerEndPoint {
                     }
                 }
             }
-        },0,5000);
+        },0,30000);
     }
 
     /**
