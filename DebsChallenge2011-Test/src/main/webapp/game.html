@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Trivia Geeks Club</title>
+    <link rel="stylesheet" href="gameStyle.css">
+</head>
+<body bgcolor = "#f0f0f0">
+<fieldset>
+
+    <div class="block_1 hline-bottom"> Answer the questions </div>
+    <br><br>
+    <h1>QuestionID: </h1><div id="questionIDBox"></div>
+    <br><br>
+    <h1>Question: </h1><div id="questionBox"></div>
+    <br><br><br>
+    <form>
+    <input type="radio" id="answer1" name="answers" value="1">
+    <label for="answer1" id = "label1"> Answer 1 </label>
+    <input type="radio" id="answer2" name="answers" value="2">
+    <label for="answer2" id = "label2">  Answer 2 </label>
+    <input type="radio" id="answer3" name="answers" value="3">
+    <label for="answer3" id = "label3"> Answer 3 </label>
+    <input type="radio" id="answer4" name="answers" value="4">
+    <label for="answer4" id = "label4">Answer4</label>
+    <br><br>
+    <input onclick="sendAnswer()" type="button" id="ansButton" value="Answer">
+    <input onclick="answerAnnulment()" type="button" id = "annulButton" value="Answer Annulment">
+    <input onclick="sendReqAnswer()" type="button" id = "mfaButton" value="Ask for the most frequent answer">
+    </form>
+    <p>Most frequent Answer is: ...</p><div id="mfaBox"></div>
+
+    <br><br><br><br>
+    <table class="a" id="myTable">
+        <tr>
+            <td>UserID</td>
+            <td>Player</td>
+            <td>Scores</td>
+        </tr>
+    </table>
+
+</fieldset>
+    <script type="text/javascript">
+        var webSocket = new WebSocket("ws://localhost:8080/DebsChallenge2011_Test_war_exploded/socket");
+        var timeMillis;
+        var checkedRadio;
+        function sendAnswer() {
+            var radios = document.getElementsByName("answers");
+            for (var i = 0; i<radios.length; i++){
+                if (radios[i].checked){
+                    checkedRadio = radios[i].value;
+                }
+            }
+            document.getElementById("ansButton").disabled = true;
+            document.getElementById("mfaBox").disabled = true;
+            var answer = checkedRadio;
+            var time = new Date();
+            //var timetoMilli = time.getTime();
+            timeMillis = time.getTime();
+            var textToSend = answer + "," +timeMillis.toString();
+            //var textToSend = answer + "," +timetoMilli.toString();
+            webSocket.send(textToSend);
+        }
+
+        function sendReqAnswer() {
+            var mfa = "mfa";
+            document.getElementById("mfaButton").disabled = true;
+            webSocket.send(mfa);
+        }
+
+        function answerAnnulment() {
+            document.getElementById("annulButton").disabled = true;
+            webSocket.send("answerAnnulment");
+        }
+
+        webSocket.onmessage = function(message) {
+            var obj = JSON.parse(message.data);
+            var table = document.getElementById("myTable");
+
+            if(obj.UserID){
+                //if(table.rows.length > 1){
+                    for(var i = table.rows.length-1; i >= 0; i--){
+                      table.deleteRow(i);
+                    }
+                //}
+
+                Object.keys(obj).forEach((key)=> {
+                    if(key !== "UserID"){
+                        var row = table.insertRow(0);
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1);
+                        var cell3 = row.insertCell(2);
+                        cell1.innerHTML = key;
+                        cell2.innerHTML = "User " + key;
+                        cell3.innerHTML = obj[key];
+                    }
+                });
+            }else if(obj.annul){
+                var time = new Date();
+                var timeToMillis = time.getTime();
+                if (timeToMillis-timeMillis < 10000){ //new answer can be given only if the annulment happened 10 sec after answering
+                    document.getElementById("ansButton").disabled = false;
+                }
+            }
+            else{
+                document.getElementById("questionIDBox").innerHTML =  obj.qId;
+                document.getElementById("questionBox").innerHTML = obj.question;
+                //document.getElementById("mfaBox").innerHTML = message.data;
+                document.getElementById("label1").innerHTML = obj.ans1;
+                document.getElementById("label2").innerHTML = obj.ans2;
+                document.getElementById("label3").innerHTML = obj.ans3;
+                document.getElementById("label4").innerHTML = obj.ans4;
+                document.getElementById("ansButton").disabled = false;
+                document.getElementById("annulButton").disabled = false;
+                document.getElementById("mfaButton").disabled = false;
+            }
+        }
+
+        webSocket.onopen = function() {
+            console.log("connection opened");
+        };
+
+        webSocket.onclose = function() {
+            alert("Game Over, No more Questions");
+            console.log("connection closed");
+        };
+        webSocket.onerror = function wserror(message) {
+            alert("Server shutting down");
+            console.log("error: " + message);
+        };
+
+    </script>
+</body>
+</html>
