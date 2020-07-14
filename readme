@@ -8,7 +8,8 @@ Fakultät IV Elektrotechnik und Informatik der Technischen Universität Berlin
 Sommersemester 2020
 _______________________________________________________________________________
  
-This program is an extension of the official solution of the DEBS Grand Challenge 2011 which was made by EsperTech using Complex Event Processing(CEP) Engine Esper. 
+This program is an extension of the official solution of the DEBS Grand Challenge 2011 
+which was made by EsperTech using Complex Event Processing(CEP) Engine Esper. 
 It is a web application which needs a web server to run on. 
 It has been created using the ultimate version of IntelliJ Idea from JetBrains and tested using Apache Tomcat 9.0.
 Extended statements in the trivia.epl file were tested using the testcases which the official solution from esper provides.
@@ -23,7 +24,7 @@ In order to compile and run the programm, please follow the following instructio
 4. Go to edit configurations and create a new configuration:
 	--choose the directory of the downloaded tomcat server
 	--copy paste "http://localhost:8080/DebsChallenge2011_Test_war_exploded/game.html" to the url field
-	--create an artifact by clicking the fix button in the warning sign
+	--create an artifact by clicking the fix button in the warning sign (choose DebsChallenge2011-Test:war exploded)
 5. Build and run the program.
 
 Open different browsers or different tabs within the same browser to play the game with more than one player. 
