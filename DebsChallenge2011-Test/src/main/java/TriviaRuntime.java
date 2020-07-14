@@ -8,17 +8,21 @@ import com.espertech.esper.compiler.client.EPCompilerProvider;
 import com.espertech.esper.runtime.client.DeploymentOptions;
 import com.espertech.esper.runtime.client.EPRuntime;
 import com.espertech.esper.runtime.client.EPRuntimeProvider;
-
 import java.io.InputStream;
 
-
 public class TriviaRuntime {
+
+    /**
+     * This class sets the configurations and initializes esper runtime. It reads the epl queries from trivia.epl file,
+     * compiles the queties into byte code and deploys it to the esper runtime
+     * @return esper runtime
+     * @throws RuntimeException if the trivia.epl file was not found in the relative path, or if an errors occurs
+     * compiling and deploying trivia.epl file
+     */
     public EPRuntime setup() {
-        //A Configuration object is responsible for specifying which LoginModules should be used for a particular
-        //application, and in what order the LoginModules should be invoked.
         Configuration config = new Configuration();
         config.getRuntime().getExecution().setPrioritized(true);
-        config.getRuntime().getThreading().setInternalTimerEnabled(false); //no use of Threads from the esper runtime
+        config.getRuntime().getThreading().setInternalTimerEnabled(false);
         config.getCompiler().getByteCode().setBusModifierEventType(EventTypeBusModifier.BUS);
         config.getCompiler().getByteCode().setAccessModifiersPublic();
 
@@ -26,7 +30,6 @@ public class TriviaRuntime {
         runtime.initialize();
 
         // Resolve "trivia.epl" file.
-        //InputStream represents inout stream of bytes
         InputStream inputFile = this.getClass().getClassLoader().getResourceAsStream("trivia.epl");
         if (inputFile == null) {
             inputFile = this.getClass().getClassLoader().getResourceAsStream("etc/trivia.epl");
@@ -41,9 +44,9 @@ public class TriviaRuntime {
             Module module = compiler.readModule(inputFile, "trivia.epl");
 
             CompilerArguments args = new CompilerArguments(config);
-            EPCompiled compiled = compiler.compile(module, args); //compile trivia.epl
+            EPCompiled compiled = compiler.compile(module, args);
 
-            // set deployment id to 'trivia'
+            //set deployment id to 'trivia'
             runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId("trivia"));
         } catch (Exception e) {
             throw new RuntimeException("Error compiling and deploying EPL from 'trivia.epl': " + e.getMessage(), e);

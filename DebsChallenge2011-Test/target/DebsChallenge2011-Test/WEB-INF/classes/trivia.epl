@@ -42,6 +42,15 @@ create window QuestionWindow#time(1 hour) as TriviaQuestion;
 @Name('Player answer history window')
 create window PlayerAnswerHistoryWindow#keepall() as (playerId string, questionId string, correct boolean, bonusEligible boolean, questionTime long);
 
+/**______#time_batch(7 minutes 58 seconds)
+_______*/
+
+@Name('Score window for a day')
+create window DailyScore#unique(playerId)#time_batch(7 minutes) as (playerId string, score int); //86400 for a day
+
+/**______upr
+_______*/
+
 /**
 * Reacting to Question.
 */
@@ -163,3 +172,16 @@ when matched then update set psw.score = psw.score + scoredPoints.points;
 
 @Name('Mark players question answer as ineligible for a bonus')
 on PlayerScoreUpdate(scoredPoints.removeEligible) psu update PlayerAnswerHistoryWindow pahw set bonusEligible = false where pahw.playerId = psu.playerId and pahw.questionId = psu.questionId;
+
+@Name('Merge score to daily player score')
+on PlayerScoreUpdate as psu merge DailyScore as ds 
+where psu.playerId = ds.playerId
+when not matched then insert select playerId, scoredPoints.points as score
+when matched then update set ds.score = ds.score + scoredPoints.points;
+
+@Name('Add to daily best')
+@Priority(0)
+on DailyScore as ds merge PlayerScoreWindow as psw
+where ds.playerId = psw.playerId
+when matched then update set psw.score = psw.score + 1000 where ds.score = (select max(score) from DailyScore);
+

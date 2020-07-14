@@ -8,11 +8,19 @@ import javax.websocket.server.ServerEndpointConfig.Configurator;
 public class ServerEndpointMonitor extends Configurator{
     private final static Logger LOGGER = Logger.getLogger(ServerEndpoint.class.getName());
 
-    private final static ServerEndPoint serverEndpoint = new ServerEndPoint();
+    private final static ServerEndPoint serverEndpoint = new ServerEndPoint(); //create an instance of the server endpoint
 
     public ServerEndpointMonitor() {
         LOGGER.setLevel(Level.INFO);
     }
+
+    /**
+     *
+     * @param endpointClass
+     * @param <T>
+     * @return the single instance of ServerEndPoint to be used by every client
+     * @throws InstantiationException
+     */
 
     @SuppressWarnings("unchecked")
     @Override

@@ -1,6 +1,9 @@
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This class provides methods to represent the events as Map<String, Object> to be send to the esper runtime
+ */
 public class EventFactory {
     public static final String QID = "questionId";
 
@@ -19,10 +22,6 @@ public class EventFactory {
         map.put("questionId", questionId);
         map.put("annulTime", annulTime);
         return map;
-    }
-
-    public static Map<String, Object> makeTriviaQuestion(String questionId, String question, String answer, long questionTime) {
-        return makeTriviaQuestion(questionId, question, answer, questionTime, new String[0]);
     }
 
     public static Map<String, Object> makeTriviaQuestion(String questionId, String question, String answer, long questionTime, String[] choices) {

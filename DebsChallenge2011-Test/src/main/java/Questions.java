@@ -1,22 +1,27 @@
 import java.io.*;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-//reads a textfile with questions and parses the questions and answers
+/**
+ * This class is responsible to read the questions from the questions.txt file and parsing questionId, question, answers
+ * and the correct answer
+ */
 public class Questions {
     private InputStream in = this.getClass().getResourceAsStream("questions.txt");
-
     private List<String> lines;
     private List<String[]> questions;
     private int lineCounter = 0;
     Questions(){
         lines = new LinkedList<>();
         questions = new LinkedList<>();
-        createQuestionArrayList();
+        createQuestionLinkedList();
     }
 
-    public void createQuestionArrayList(){
+    /**
+     * This method reads the file line by line and adds the quetions in the question list
+     * @throws IOException if an error happens reading the file
+     */
+    public void createQuestionLinkedList(){
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String st;
@@ -32,18 +37,31 @@ public class Questions {
         }
     }
 
+    /**
+     *
+     * @return the nest question from the questions list
+     */
     public String[] getNextQuestion(){
         if(lineCounter == questions.size()) lineCounter = 0;
         String[] getQuestion = questions.get(lineCounter);
         lineCounter++;
-        return getQuestion; //return a single question
+        return getQuestion;
     }
 
+    /**
+     *
+     * @return questions list
+     */
     public List<String[]> getQuestionList(){
-        return this.questions; //return the question list
+        return this.questions;
     }
 
-    public int getQuestionListSize(){return questions.size();}
-
+    /**
+     *
+     * @return size of the questions list
+     */
+    public int getQuestionListSize(){
+        return questions.size();
+    }
 
 }

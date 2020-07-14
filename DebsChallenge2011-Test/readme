@@ -1,0 +1,16 @@
+
+This programm is an extension of the official solution of the Debs Grand Challenge 2011 made by EsperTech using the Esper Complex Event Processing(CEP) Engine. It is a web application which needs a web server to run it with. 
+It has been created using the ultimate version of IntelliJ Idea from JetBrains and tested using Apache Tomcat 9.0
+
+In order to compile and run the programm, please follow the following instructions.
+
+1. Download Apache Tomcat. https://tomcat.apache.org/download-90.cgi
+2. Download IntelliJ Idea. https://www.jetbrains.com/idea/download/
+3. Import the programm using pom.xml file to ensure that all dependenies of the programm are set.
+4. Go to edit configurations and create a new configuration:
+	--choose the directory of the downloaded tomcat server
+	--copy paste "http://localhost:8080/DebsChallenge2011_Test_war_exploded/game.html" to the url field
+	--create an artifact by clicking the fix button in the warning sign
+5. Build and run the programm
+
+Open different browsers of different tabs within the same browser to play the game with more than one player. After answering all the provided questions every 30 sec the game will stop and you can see in the scoring table the player with the highest score number.The result of most frequent answer is only printed in the server console. We did not achieve to send it back to the client
