@@ -14,9 +14,9 @@ public class TriviaRuntime {
 
     /**
      * This class sets the configurations and initializes esper runtime. It reads the epl queries from trivia.epl file,
-     * compiles the queties into byte code and deploys it to the esper runtime
+     * compiles the queries into byte code and deploys it to the esper runtime
      * @return esper runtime
-     * @throws RuntimeException if the trivia.epl file was not found in the relative path, or if an errors occurs
+     * @throws RuntimeException if the trivia.epl file was not found in the relative path, or if errors occurs
      * compiling and deploying trivia.epl file
      */
     public EPRuntime setup() {

@@ -18,7 +18,7 @@ public class Questions {
     }
 
     /**
-     * This method reads the file line by line and adds the quetions in the question list
+     * This method reads the file line by line and adds the quetions in the questions list
      * @throws IOException if an error happens reading the file
      */
     public void createQuestionLinkedList(){
@@ -39,7 +39,7 @@ public class Questions {
 
     /**
      *
-     * @return the nest question from the questions list
+     * @return the next question from the questions list
      */
     public String[] getNextQuestion(){
         if(lineCounter == questions.size()) lineCounter = 0;

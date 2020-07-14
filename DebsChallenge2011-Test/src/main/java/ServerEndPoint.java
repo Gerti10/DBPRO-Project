@@ -11,11 +11,11 @@ import java.util.*;
 
 /**
  * This class provides an Endpoint for the user Interface. Every user will be connected with the sockets provided
- * by this class. It creates the esper runtime, sends events to esper based on the player answers, iterates throw
+ * by this class. It creates the esper runtime, sends events to esper based on the player answers, iterates throgh
  * the score results provided by esper and attaches a listener to get the most frequent answer when asked from the
  * player.
- * It will be instantiated only once, so that every player connects with the same esper engine and get the actual
- * questionn.
+ * It will be instantiated only once, so that every player connects with the same esper engine and get the same
+ * question.
  */
 @ServerEndpoint(value = "/socket", configurator = ServerEndpointMonitor.class)
 public class ServerEndPoint {
@@ -27,11 +27,11 @@ public class ServerEndPoint {
     TriviaRuntime example = new TriviaRuntime(); //configurates esper runtime
     EPRuntime runtime = example.setup(); //
     public Set<Session> allSessions = new HashSet<>(); //saves all open sessions
-    int counter = 0; //counter to stop the programm after every question was asked
+    int counter = 0; //counter to stop the program after every question was asked
     public Timer timer; //timer to ensure that a question is made once in 30 sec
 
     /**
-     * runDemo is the main function of the programm. It is called every 30 seconds to create a question event, send it
+     * runDemo is the main function of the program. It is called every 30 seconds to create a question event, send it
      * to Esper runtime as well as to user interface. It also sends the updated scores to the client when a question
      * timer is finished.
      */
@@ -65,11 +65,11 @@ public class ServerEndPoint {
                     }
                 }
             }
-        },0,9000);
+        },0,5000);
     }
 
     /**
-     * Server Endpoint Constructor which is called at programm startup to create a single instance of this class
+     * Server Endpoint Constructor which is called at program startup to create a single instance of this class
      */
     public ServerEndPoint() {
         runDemo();
@@ -96,7 +96,7 @@ public class ServerEndPoint {
      * message type (most frequent answer request, answer annulment, player answer)
      * @param message, received from the client in text form.
      * @param session, session from which the message comes to the server
-     * @throws IOException if an error happens during transsion of message to the user inteface.
+     * @throws IOException if an error happens during transmission of message to the user interface.
      */
     @OnMessage
     public void onMessage(String message, Session session) {
@@ -166,7 +166,7 @@ public class ServerEndPoint {
 
     /**
      *
-     * @param runtime, esper runtime to iterate throw the score results
+     * @param runtime, esper runtime to iterate through the score results
      * @return Map<String, Integer> containing every playerID and scores he has achieved
      */
     public static Map<String, Integer> getScores(EPRuntime runtime) {
